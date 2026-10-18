@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Esplora la cellula vegetale</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: tavola da laboratorio — a sinistra l'immagine con i punti cliccabili, a destra la scheda dell'organello; sotto, le schede delle viste ingrandite */
+:root{
+  --bg:#F3F6EE; --surface:#FFFFFF; --ink:#17342A; --text:#2A3D34; --muted:#5A6E64;
+  --line:#CFDCD0; --leaf:#2F6B4F; --leaf-soft:#E3EDD9; --pin:#C2612C; --pin-ring:#FFFFFF;
+  --ok:#2F6B4F; --ok-soft:#DDEFD9; --ko:#A63A3A; --ko-soft:#F6DEDA;
+  --display:'Fredoka', 'Trebuchet MS', Arial, sans-serif;
+  --body:'Nunito Sans', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111C17; --surface:#18271F; --ink:#EAF2E6; --text:#D3E0D6; --muted:#9AB0A3;
+  --line:#2C4237; --leaf:#8CC79F; --leaf-soft:#20372B; --pin:#E58A55; --pin-ring:#111C17;
+  --ok:#8CC79F; --ok-soft:#1F3A2B; --ko:#F09A8E; --ko-soft:#3D2420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111C17; --surface:#18271F; --ink:#EAF2E6; --text:#D3E0D6; --muted:#9AB0A3;
+  --line:#2C4237; --leaf:#8CC79F; --leaf-soft:#20372B; --pin:#E58A55; --pin-ring:#111C17;
+  --ok:#8CC79F; --ok-soft:#1F3A2B; --ko:#F09A8E; --ko-soft:#3D2420; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,42px);line-height:1.1;color:var(--ink);margin:0;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.modes{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.modes button{font:inherit;font-weight:700;border:0;background:transparent;color:var(--text);padding:8px 16px;border-radius:999px;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--leaf);color:var(--bg)}
+nav.views{display:flex;flex-wrap:wrap;gap:8px}
+nav.views button{font:inherit;font-weight:700;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:10px;cursor:pointer}
+nav.views button[aria-pressed="true"]{border-color:var(--leaf);background:var(--leaf-soft);color:var(--ink)}
+.stage{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:1fr}}
+.figure{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.figure img{display:block;width:100%;height:auto}
+.pin{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:3px solid var(--pin-ring);
+  background:var(--pin);color:#FFFFFF;font:800 14px/1 var(--body);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);padding:0}
+.pin:hover{transform:translate(-50%,-50%) scale(1.12)}
+.pin:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+.pin[aria-current="true"]{background:var(--leaf);transform:translate(-50%,-50%) scale(1.18)}
+.pin.ok{background:var(--ok)} .pin.ko{background:var(--ko)}
+.quizmode .pin{color:transparent}
+@media (prefers-reduced-motion:reduce){.pin{transition:none}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--leaf);margin:0}
+.card h2{font-family:var(--display);font-weight:600;font-size:28px;line-height:1.15;color:var(--ink);margin:0;text-wrap:balance}
+.row{display:flex;flex-direction:column;gap:2px}
+.row b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.row p{margin:0}
+.book{font-size:15px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin:0}
+.list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.list button{font:inherit;font-size:15px;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:7px 10px;border-radius:8px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.list button span{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:50%;background:var(--pin);color:#FFFFFF;font-weight:800;font-size:12px}
+.list button[aria-current="true"]{border-color:var(--leaf);background:var(--leaf-soft)}
+.quiz-q{font-family:var(--display);font-size:24px;color:var(--ink);margin:0}
+.feedback{margin:0;padding:10px 12px;border-radius:10px;font-weight:700}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)} .feedback.ko{background:var(--ko-soft);color:var(--ko)}
+.score{font-variant-numeric:tabular-nums;color:var(--muted);margin:0}
+.btn{font:inherit;font-weight:800;border:0;background:var(--leaf);color:var(--bg);padding:10px 16px;border-radius:10px;cursor:pointer;align-self:start}
+.hint{color:var(--muted);font-size:15px;margin:0}
+footer{color:var(--muted);font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Esplora la cellula vegetale</h1>
+      <p class="sub">Tocca un numero: leggi che cos’è e a cosa serve. I termini sono quelli del libro Viridis (Modulo 3, Unità 1).</p>
+    </div>
+    <div class="modes" role="group" aria-label="Modalità">
+      <button id="m-explore" aria-pressed="true">Esplora</button>
+      <button id="m-quiz" aria-pressed="false">Mettiti alla prova</button>
+    </div>
+  </header>
+
+  <nav class="views" aria-label="Viste" id="views"></nav>
+
+  <div class="stage" id="stage">
+    <div class="figure" id="figure"><img id="img" alt=""></div>
+    <div class="card" id="panel" aria-live="polite"></div>
+  </div>
+
+  <div class="card">
+    <p class="eyebrow">Tutte le strutture di questa vista</p>
+    <ul class="list" id="list"></ul>
+  </div>
+
+  <footer>Riferimento: Viridis, Modulo 3 – Botanica generale e sistematica, Unità 1 “La cellula e i tessuti vegetali”, pp. 155-161. Illustrazioni del percorso introduttivo.</footer>
+</div>
+
+<script>
+const VIEWS = [
+ {id:'panorama', label:'Tutta la cellula', img:'img/01_cellula_vegetale_panorama.jpg', alt:'Cellula vegetale in sezione',
+  intro:'Una cellula del parenchima clorofilliano di una foglia, aperta come una scatola. Ha tutto ciò che hanno le cellule eucariotiche, più tre cose speciali: parete, grande vacuolo e plastidi.',
+  items:[
+   [6,64,'Parete cellulare','Involucro rigido esterno alla membrana plasmatica, fatto di microfibrille di cellulosa immerse in emicellulose, pectine e proteine strutturali.','Sostiene e protegge la cellula, le dà una forma definita, fa passare acqua e soluti ed è responsabile del turgore cellulare.','p. 157'],
+   [15,58,'Membrana plasmatica (plasmalemma)','Sottile doppio strato di fosfolipidi con proteine, subito sotto la parete.','Controlla che cosa entra ed esce dalla cellula.','p. 157'],
+   [20,12,'Nucleo','Grande organello avvolto da una doppia membrana con pori (involucro nucleare). Contiene il DNA.','Custodisce le istruzioni della cellula e ne coordina tutte le attività.',''],
+   [28,20,'Nucleolo','Zona più scura dentro il nucleo.','Prepara le parti che formeranno i ribosomi.',''],
+   [30,34,'Reticolo endoplasmatico ruvido','Sacchetti appiattiti collegati al nucleo, coperti di ribosomi (per questo è “ruvido”, o rugoso).','Costruisce le proteine destinate ad altri organelli, alle membrane o all’esterno.','p. 159'],
+   [52,15,'Reticolo endoplasmatico liscio','Rete di tubicini senza ribosomi.','Costruisce i lipidi (grassi) e partecipa alla detossificazione.',''],
+   [82,30,'Apparato di Golgi','Pila di sacchetti appiattiti e curvi.','Modifica, smista e impacchetta le sostanze in vescicole dirette alla membrana, alla parete o al vacuolo.','p. 159'],
+   [87,36,'Vescicole','Piccole “bolle” di membrana.','Trasportano sostanze da un organello all’altro e verso la membrana.',''],
+   [58,50,'Vacuolo','Grande sacco delimitato dal tonoplasto e pieno di succo vacuolare. Nelle cellule adulte può occupare fino al 90% del volume.','Fa da magazzino (zuccheri, proteine, acidi, pigmenti…), digerisce (funzione litica) e mantiene il turgore cellulare.','pp. 158-159'],
+   [15,45,'Cloroplasto','Plastidio verde: contiene clorofilla e pile di tilacoidi (grana).','Fa la fotosintesi clorofilliana: con luce, acqua e CO₂ produce zuccheri e libera ossigeno.','p. 160'],
+   [25,52,'Mitocondrio','Organello con doppia membrana; quella interna è ripiegata in creste.','Fa la respirazione cellulare: ricava energia dagli zuccheri usando l’ossigeno.',''],
+   [24,62,'Perossisoma','Piccola vescicola.','Elimina sostanze dannose per la cellula, come l’acqua ossigenata.',''],
+   [64,31,'Ribosomi','Granuli piccolissimi (i puntini viola), liberi nel citoplasma o attaccati al reticolo.','Costruiscono le proteine unendo gli amminoacidi.',''],
+   [58,74,'Citoplasma','Liquido (citosol) che riempie la cellula dentro la membrana, con gli organelli e il citoscheletro.','È l’ambiente in cui avvengono molte reazioni chimiche.','p. 157 (protoplasto = citoplasma + membrana)'],
+   [43,84,'Plasmodesma','Ponte di citoplasma che attraversa la parete passando per i fori detti punteggiature.','Mette in comunicazione cellule vicine: acqua e soluti passano per via simplastica.','p. 158']
+  ]},
+ {id:'endo', label:'Endomembrane', img:'img/03_sistema_endomembrane.jpg', alt:'Sistema di endomembrane',
+  intro:'Il sistema di endomembrane: nucleo, reticolo endoplasmatico, apparato di Golgi, vescicole e vacuolo si scambiano continuamente sostanze.',
+  items:[
+   [4,22,'Nucleo e involucro nucleare','Nucleo avvolto da una doppia membrana.','Contiene il DNA; l’involucro separa il nucleo dal citoplasma.',''],
+   [21,33,'Pori nucleari','Aperture nell’involucro nucleare.','Regolano gli scambi tra nucleo e citoplasma.',''],
+   [11,40,'Nucleolo','Zona interna del nucleo.','Prepara le parti dei ribosomi.',''],
+   [36,35,'Reticolo endoplasmatico ruvido','Membrane ripiegate coperte di ribosomi.','Produce proteine; le proteine di riserva possono andare al vacuolo direttamente o passando dal Golgi.','p. 159'],
+   [25,80,'Reticolo endoplasmatico liscio','Tubicini senza ribosomi.','Produce lipidi.',''],
+   [53,23,'Vescicole di trasporto','Bollicine che si staccano dal reticolo.','Portano le sostanze al Golgi.',''],
+   [66,35,'Apparato di Golgi','Pila di sacchetti curvi.','Modifica ulteriormente le proteine, le smista e le impacchetta.','p. 159'],
+   [93,24,'Vescicola e membrana plasmatica','Vescicola che si fonde con la membrana.','Porta le sostanze fuori dalla cellula o verso la parete.',''],
+   [65,85,'Vacuolo','Grande vacuolo delimitato dal tonoplasto.','Riceve sostanze dalle vescicole; fa da magazzino e mantiene il turgore.','pp. 158-159']
+  ]},
+ {id:'parete', label:'Parete e plasmodesmi', img:'img/02_parete_plasmodesmi.jpg', alt:'Pareti di due cellule vicine con plasmodesmi',
+  intro:'Due cellule vicine. Tra le loro pareti c’è la lamella mediana; i plasmodesmi le collegano attraverso le punteggiature.',
+  items:[
+   [10,40,'Vacuolo','Grande vacuolo della cellula.','Magazzino e turgore.',''],
+   [17,15,'Cloroplasto','Plastidio verde.','Fotosintesi.',''],
+   [25,30,'Reticolo endoplasmatico','Tubuli di membrana.','Continua nei plasmodesmi con il desmotubulo.','p. 158'],
+   [35,72,'Membrana plasmatica','Il bordo dorato del protoplasto.','Controlla gli scambi; riveste anche il canale del plasmodesma.',''],
+   [36,15,'Parete primaria','Microfibrille di cellulosa in una matrice di emicellulose, pectine e proteine.','Sostiene e protegge; è impregnata d’acqua e fa passare soluti per via apoplastica.','p. 157-158'],
+   [43,15,'Lamella mediana','Strato di pectina tra le pareti di due cellule.','Fa aderire le cellule vicine. Se funghi o maturazione eccessiva la digeriscono, il tessuto si spappola.','p. 158'],
+   [56,20,'Parete secondaria','Strati aggiunti verso l’interno dopo la crescita, ricchi di cellulosa; possono contenere lignina o suberina.','Rende la parete più rigida (legno) o impermeabile (sughero).','p. 157'],
+   [43,51,'Plasmodesma e punteggiatura','Ponte di citoplasma che passa in un foro della parete (punteggiatura).','Fa passare acqua e soluti da cellula a cellula: via simplastica.','p. 158'],
+   [73,61,'Desmotubulo','Sottile tubulo del reticolo endoplasmatico dentro il plasmodesma.','Collega il reticolo di una cellula con quello della cellula vicina.','p. 158']
+  ]},
+ {id:'plastidi', label:'Cloroplasto e mitocondrio', img:'img/04_cloroplasto_mitocondrio.jpg', alt:'Cloroplasto e mitocondrio in sezione',
+  intro:'A sinistra un cloroplasto, a destra un mitocondrio. Entrambi hanno doppia membrana, DNA circolare e ribosomi propri.',
+  items:[
+   [4,45,'Doppia membrana del cloroplasto','Membrana esterna e membrana interna.','Separano il cloroplasto dal citoplasma.','p. 159'],
+   [29,22,'Granum (pl. grana)','Pila di tilacoidi, cisterne appiattite.','Sulla membrana dei tilacoidi ci sono clorofilla e fotosistemi: qui avviene la fase luminosa della fotosintesi.','p. 160'],
+   [39,33,'Tilacoidi intergranali o stromatici','Tilacoidi che collegano un granum all’altro attraversando lo stroma.','Uniscono i grana in un unico sistema.','p. 160'],
+   [37,73,'Stroma','Liquido (matrice) all’interno del cloroplasto.','Qui avviene il ciclo di Calvin: la CO₂ entra nella gliceraldeide-3-fosfato e si formano gli zuccheri.','p. 160'],
+   [15,62,'Granulo di amido primario','Deposito di amido dentro il cloroplasto.','Riserva temporanea: di notte diventa glucosio e saccarosio.','p. 160'],
+   [32,66,'DNA circolare del cloroplasto','Molecola di DNA ad anello.','Contiene alcune istruzioni proprie del plastidio.','p. 159'],
+   [55,62,'Membrana esterna del mitocondrio','Involucro esterno liscio.','Separa il mitocondrio dal citoplasma.',''],
+   [72,30,'Creste mitocondriali','Pieghe della membrana interna.','Aumentano la superficie dove si produce energia.',''],
+   [73,50,'Matrice mitocondriale','Interno del mitocondrio.','Qui avvengono molte reazioni della respirazione.',''],
+   [80,50,'DNA circolare del mitocondrio','Molecola di DNA ad anello.','Contiene alcune istruzioni proprie del mitocondrio.','']
+  ]},
+ {id:'turgore', label:'Turgore e plasmolisi', img:'img/05_turgore_plasmolisi.jpg', alt:'Cellula plasmolizzata, flaccida e turgida',
+  intro:'La stessa cellula con quantità diverse di acqua nel vacuolo.',
+  items:[
+   [16,50,'Cellula plasmolizzata','Il vacuolo ha perso molta acqua e il protoplasto si stacca dalla parete (plasmolisi).','Succede se la cellula sta in una soluzione molto concentrata, per esempio in acqua salata.','Attività pratica 1, pp. 264-265'],
+   [50,50,'Cellula flaccida','Il vacuolo ha poca acqua e non preme sulla parete.','Foglie e fusti erbacei si afflosciano: è l’appassimento, reversibile. L’avvizzimento invece è la morte delle cellule, irreversibile.','p. 159'],
+   [83,50,'Cellula turgida','Il vacuolo è pieno d’acqua e preme sulla parete, che resiste.','Questo equilibrio è il turgore cellulare: rende rigidi fusti erbacei e foglie.','p. 159']
+  ]}
+];
+
+let view = VIEWS[0], current = -1, mode = 'explore', quiz = null;
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderViews(){
+  $('views').innerHTML = VIEWS.map(v => `<button data-v="${v.id}" aria-pressed="${v===view}">${esc(v.label)}</button>`).join('');
+  $('views').querySelectorAll('button').forEach(b => b.onclick = () => { view = VIEWS.find(v => v.id === b.dataset.v); current = -1; if (mode==='quiz') startQuiz(); render(); });
+}
+function render(){
+  renderViews();
+  const img = $('img'); img.src = view.img; img.alt = view.alt;
+  const fig = $('figure');
+  fig.querySelectorAll('.pin').forEach(p => p.remove());
+  view.items.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.className = 'pin'; b.style.left = it[0] + '%'; b.style.top = it[1] + '%';
+    b.textContent = i + 1;
+    b.setAttribute('aria-label', mode === 'quiz' ? 'Punto ' + (i + 1) : it[2]);
+    if (i === current && mode === 'explore') b.setAttribute('aria-current', 'true');
+    b.onclick = () => mode === 'explore' ? select(i) : answer(i, b);
+    fig.appendChild(b);
+  });
+  $('stage').classList.toggle('quizmode', mode === 'quiz');
+  $('list').innerHTML = view.items.map((it, i) => `<li><button data-i="${i}" ${i===current?'aria-current="true"':''}><span>${i+1}</span>${esc(it[2])}</button></li>`).join('');
+  $('list').querySelectorAll('button').forEach(b => b.onclick = () => { if (mode !== 'explore') setMode('explore'); select(+b.dataset.i); });
+  mode === 'explore' ? renderPanel() : renderQuiz();
+}
+function select(i){ current = i; render(); }
+function renderPanel(){
+  if (current < 0){
+    $('panel').innerHTML = `<p class="eyebrow">${esc(view.label)}</p><h2>Scegli un numero</h2><p>${esc(view.intro)}</p><p class="hint">Tocca un numero sull’immagine o un nome nell’elenco qui sotto.</p>`;
+    return;
+  }
+  const it = view.items[current];
+  $('panel').innerHTML = `<p class="eyebrow">${current+1} · ${esc(view.label)}</p><h2>${esc(it[2])}</h2>
+   <div class="row"><b>Che cos’è</b><p>${esc(it[3])}</p></div>
+   <div class="row"><b>A cosa serve</b><p>${esc(it[4])}</p></div>
+   ${it[5] ? `<p class="book">Sul libro: Viridis, ${esc(it[5])}</p>` : ''}`;
+}
+function startQuiz(){
+  const order = view.items.map((_, i) => i).sort(() => Math.random() - .5);
+  quiz = {order, k:0, right:0, done:new Set(), fb:null};
+}
+function renderQuiz(){
+  if (!quiz) startQuiz();
+  if (quiz.k >= quiz.order.length){
+    $('panel').innerHTML = `<p class="eyebrow">Mettiti alla prova · ${esc(view.label)}</p><h2>Finito!</h2><p class="score">Risposte giuste al primo colpo: ${quiz.right} su ${quiz.order.length}</p><button class="btn" id="again">Ricomincia</button>`;
+    $('again').onclick = () => { startQuiz(); render(); };
+    return;
+  }
+  const target = view.items[quiz.order[quiz.k]];
+  $('panel').innerHTML = `<p class="eyebrow">Mettiti alla prova · ${esc(view.label)}</p>
+   <p class="quiz-q">Dov’è: <b>${esc(target[2])}</b>?</p>
+   <p class="hint">Tocca il punto giusto sull’immagine.</p>
+   ${quiz.fb ? `<p class="feedback ${quiz.fb.ok?'ok':'ko'}">${esc(quiz.fb.text)}</p>` : ''}
+   <p class="score">Domanda ${quiz.k+1} di ${quiz.order.length} · giuste: ${quiz.right}</p>`;
+}
+function answer(i, el){
+  const t = quiz.order[quiz.k];
+  if (i === t){
+    if (!quiz.missed) quiz.right++;
+    quiz.fb = {ok:true, text:'Giusto! ' + view.items[t][2] + ': ' + view.items[t][4]};
+    quiz.k++; quiz.missed = false;
+  } else {
+    quiz.missed = true;
+    quiz.fb = {ok:false, text:'No, quello è: ' + view.items[i][2] + '. Riprova.'};
+  }
+  render();
+}
+function setMode(m){
+  mode = m; $('m-explore').setAttribute('aria-pressed', m==='explore'); $('m-quiz').setAttribute('aria-pressed', m==='quiz');
+  if (m === 'quiz') startQuiz();
+  render();
+}
+$('m-explore').onclick = () => setMode('explore');
+$('m-quiz').onclick = () => setMode('quiz');
+render();
+</script>
+
+</html>
