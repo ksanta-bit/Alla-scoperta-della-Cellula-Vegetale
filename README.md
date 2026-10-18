@@ -1,6 +1,6 @@
 # Alla scoperta della Cellula Vegetale
 
-Materiale didattico di Agrobiologia per le classi prime (1ATL, 1BTL).
+Materiale didattico di Agrobiologia per le classi prime (1ATL, 1BTL), a cura di **Gianluca Simonetti** – IIS “8 Marzo – K. Lorenz”, Mirano.
 Riferimento: *Viridis*, Modulo 3 “Botanica generale e sistematica”, Unità 1 “La cellula e i tessuti vegetali”, pp. 155-169.
 
 ## Contenuto
