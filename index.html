@@ -37,13 +37,18 @@ nav.views button[aria-pressed="true"]{border-color:var(--leaf);background:var(--
 @media (max-width:860px){.stage{grid-template-columns:1fr}}
 .figure{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .figure img{display:block;width:100%;height:auto}
-.pin{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:3px solid var(--pin-ring);
-  background:var(--pin);color:#FFFFFF;font:800 14px/1 var(--body);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);padding:0}
-.pin:hover{transform:translate(-50%,-50%) scale(1.12)}
+.pin{position:absolute;z-index:3;transform:translate(-50%,-50%);width:44px;height:44px;border:0;background:transparent;color:#FFFFFF;
+  font:800 14px/1 var(--body);display:grid;place-items:center;cursor:pointer;padding:0}
+.pin span{width:30px;height:30px;border-radius:50%;border:3px solid var(--pin-ring);background:var(--pin);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.pin:hover span{transform:scale(1.12)}
 .pin:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
-.pin[aria-current="true"]{background:var(--leaf);transform:translate(-50%,-50%) scale(1.18)}
-.pin.ok{background:var(--ok)} .pin.ko{background:var(--ko)}
-.quizmode .pin{color:transparent}
+.pin[aria-current="true"] span{background:var(--leaf);transform:scale(1.18)}
+.pin.ok span{background:var(--ok)} .pin.ko span{background:var(--ko)}
+.quizmode .pin span{color:transparent}
+.annotation-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+.annotation-layer line{stroke:var(--pin);stroke-width:.65;stroke-dasharray:1.5 1.2;vector-effect:non-scaling-stroke}
+.annotation-layer circle{fill:var(--pin);stroke:var(--pin-ring);stroke-width:.45;vector-effect:non-scaling-stroke}
+.annotation-layer ellipse{fill:color-mix(in srgb,var(--pin) 12%,transparent);stroke:var(--pin);stroke-width:.7;stroke-dasharray:2 1.5;vector-effect:non-scaling-stroke}
 @media (prefers-reduced-motion:reduce){.pin{transition:none}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--leaf);margin:0}
@@ -103,7 +108,7 @@ const VIEWS = [
    [28,20,'Nucleolo','Zona più scura dentro il nucleo.','Prepara le parti che formeranno i ribosomi.',''],
    [30,34,'Reticolo endoplasmatico ruvido','Sacchetti appiattiti collegati al nucleo, coperti di ribosomi (per questo è “ruvido”, o rugoso).','Costruisce le proteine destinate ad altri organelli, alle membrane o all’esterno.','p. 159'],
    [52,15,'Reticolo endoplasmatico liscio','Rete di tubicini senza ribosomi.','Costruisce i lipidi (grassi) e partecipa alla detossificazione.',''],
-   [82,30,'Apparato di Golgi','Pila di sacchetti appiattiti e curvi.','Modifica, smista e impacchetta le sostanze in vescicole dirette alla membrana, alla parete o al vacuolo.','p. 159'],
+   [87,19,'Apparato di Golgi','Pila di sacchetti appiattiti e curvi.','Modifica, smista e impacchetta le sostanze in vescicole dirette alla membrana, alla parete o al vacuolo.','p. 159',{target:[82,30]}],
    [87,36,'Vescicole','Piccole “bolle” di membrana.','Trasportano sostanze da un organello all’altro e verso la membrana.',''],
    [40,27,'Tonoplasto','La membrana che avvolge il vacuolo: un doppio strato di fosfolipidi con proteine, come la membrana plasmatica.','Decide che cosa entra ed esce dal vacuolo. Le sue pompe protoniche aiutano il vacuolo ad accumulare sali e zuccheri, che richiamano acqua: così si crea il turgore.','p. 158'],
    [58,50,'Vacuolo','Grande sacco delimitato dal tonoplasto e pieno di succo vacuolare. Nelle cellule adulte può occupare fino al 90% del volume.','Fa da magazzino (zuccheri, proteine, acidi, pigmenti…), digerisce (funzione litica) e mantiene il turgore cellulare.','pp. 158-159'],
@@ -111,19 +116,19 @@ const VIEWS = [
    [25,52,'Mitocondrio','Organello con doppia membrana; quella interna è ripiegata in creste.','Fa la respirazione cellulare: ricava energia dagli zuccheri usando l’ossigeno.',''],
    [24,62,'Perossisoma','Piccola vescicola.','Elimina sostanze dannose per la cellula, come l’acqua ossigenata.',''],
    [64,31,'Ribosomi','Granuli piccolissimi (i puntini viola), liberi nel citoplasma o attaccati al reticolo.','Costruiscono le proteine unendo gli amminoacidi.',''],
-   [66,73,'Citoplasma','Liquido (citosol) che riempie la cellula dentro la membrana, con gli organelli e il citoscheletro.','È l’ambiente in cui avvengono molte reazioni chimiche.','p. 157 (protoplasto = citoplasma + membrana)'],
-   [43,84,'Plasmodesma','Ponte di citoplasma che attraversa la parete passando per i fori detti punteggiature.','Mette in comunicazione cellule vicine: acqua e soluti passano per via simplastica.','p. 158']
+   [83,90,'Citoplasma','Liquido (citosol) che riempie la cellula dentro la membrana, con gli organelli e il citoscheletro.','È l’ambiente in cui avvengono molte reazioni chimiche.','p. 157 (protoplasto = citoplasma + membrana)',{target:[70,76],area:[70,76,20,10]}],
+   [43,95,'Plasmodesma','Ponte di citoplasma che attraversa la parete passando per i fori detti punteggiature.','Mette in comunicazione cellule vicine: acqua e soluti passano per via simplastica.','p. 158',{target:[43,84]}]
   ]},
  {id:'membrana', label:'Membrana plasmatica', img:'img/06_membrana_plasmatica.jpg', alt:'Doppio strato di fosfolipidi con proteine',
   intro:'La membrana plasmatica vista da vicinissimo: un doppio strato di fosfolipidi con proteine immerse, come tessere di un mosaico che si muovono (modello a mosaico fluido).',
   items:[
-   [7,19,'Fosfolipide','Molecola con una testa che ama l’acqua (idrofila) e due code che la evitano (idrofobe).','È il “mattone” della membrana: tanti fosfolipidi insieme formano un velo continuo.',''],
-   [20,39,'Teste idrofile','Le teste dei fosfolipidi, rivolte verso l’acqua fuori e dentro la cellula.','Stanno a contatto con l’acqua di entrambi i lati.',''],
-   [30,52,'Code idrofobe','Le code dei fosfolipidi, nascoste al centro del doppio strato.','Formano una barriera che l’acqua e le sostanze sciolte non attraversano da sole.',''],
-   [42,52,'Proteina transmembrana a canale','Proteina che attraversa tutto il doppio strato e ha un tunnel al centro (per esempio le acquaporine).','Fa passare acqua o ioni senza spendere energia (trasporto passivo). Così l’acqua arriva al vacuolo.',''],
-   [69,52,'Proteina transmembrana di trasporto','Proteina che attraversa la membrana e cambia forma.','Afferra una sostanza da un lato e la lascia dall’altro, come una porta girevole.',''],
-   [19,76,'Proteina periferica','Proteina appoggiata solo su un lato della membrana.','Aiuta le altre proteine, riceve segnali o si lega al citoscheletro.',''],
-   [96,55,'Doppio strato di fosfolipidi','Due file di fosfolipidi con le code una di fronte all’altra.','Separa l’interno dall’esterno della cellula e decide che cosa passa.','p. 157 (plasmalemma)']
+   [4,34,'Fosfolipide','Molecola con una testa che ama l’acqua (idrofila) e due code che la evitano (idrofobe).','È il “mattone” della membrana: tanti fosfolipidi insieme formano un velo continuo.','',{target:[7,45]}],
+   [27,18,'Teste idrofile','Le teste dei fosfolipidi, rivolte verso l’acqua fuori e dentro la cellula.','Stanno a contatto con l’acqua di entrambi i lati.','',{target:[20,39]}],
+   [30,68,'Code idrofobe','Le code dei fosfolipidi, nascoste al centro del doppio strato.','Formano una barriera che l’acqua e le sostanze sciolte non attraversano da sole.','',{target:[30,52]}],
+   [43,22,'Proteina transmembrana a canale','Proteina che attraversa tutto il doppio strato e ha un tunnel al centro (per esempio le acquaporine).','Fa passare acqua o ioni senza spendere energia (trasporto passivo). Così l’acqua arriva al vacuolo.','',{target:[44,52]}],
+   [69,22,'Proteina transmembrana di trasporto','Proteina che attraversa la membrana e cambia forma.','Afferra una sostanza da un lato e la lascia dall’altro, come una porta girevole.','',{target:[69,52]}],
+   [9,78,'Proteina periferica','Proteina appoggiata solo su un lato della membrana.','Aiuta le altre proteine, riceve segnali o si lega al citoscheletro.','',{target:[19,76]}],
+   [96,75,'Doppio strato di fosfolipidi','Due file di fosfolipidi con le code una di fronte all’altra.','Separa l’interno dall’esterno della cellula e decide che cosa passa.','p. 157 (plasmalemma)',{target:[96,55]}]
   ]},
  {id:'pompa', label:'Pompa sodio-potassio', img:'img/07_pompa_sodio_potassio.jpg', alt:'Pompa sodio-potassio nella membrana',
   intro:'Pensa a una barca che imbarca acqua: l’acqua (il sodio) entra da sola e un marinaio (la pompa) la butta fuori con il secchio, facendo fatica (ATP). Fuori il sodio, dentro il potassio: serve a controllare l’acqua, a far entrare il nutrimento e a mandare segnali. È tipica delle cellule animali: nelle piante c’è la pompa protonica (vista successiva).',
@@ -156,7 +161,7 @@ const VIEWS = [
    [53,23,'Vescicole di trasporto','Bollicine che si staccano dal reticolo.','Portano le sostanze al Golgi.',''],
    [66,35,'Apparato di Golgi','Pila di sacchetti curvi.','Modifica ulteriormente le proteine, le smista e le impacchetta.','p. 159'],
    [93,24,'Vescicola e membrana plasmatica','Vescicola che si fonde con la membrana.','Porta le sostanze fuori dalla cellula o verso la parete.',''],
-   [65,85,'Vacuolo e tonoplasto','Grande vacuolo avvolto dalla sua membrana, il tonoplasto.','Riceve sostanze dalle vescicole; fa da magazzino e mantiene il turgore.','pp. 158-159']
+   [80,91,'Vacuolo e tonoplasto','Grande vacuolo avvolto dalla sua membrana, il tonoplasto.','Riceve sostanze dalle vescicole; fa da magazzino e mantiene il turgore.','pp. 158-159',{target:[91,69],area:[78,83,29,20]}]
   ]},
  {id:'parete', label:'Parete e plasmodesmi', img:'img/02_parete_plasmodesmi.jpg', alt:'Pareti di due cellule vicine con plasmodesmi',
   intro:'Due cellule vicine. Tra le loro pareti c’è la lamella mediana; i plasmodesmi le collegano attraverso le punteggiature.',
@@ -168,29 +173,29 @@ const VIEWS = [
    [36,15,'Parete primaria','Microfibrille di cellulosa in una matrice di emicellulose, pectine e proteine.','Sostiene e protegge; è impregnata d’acqua e fa passare soluti per via apoplastica.','p. 157-158'],
    [43,15,'Lamella mediana','Strato di pectina tra le pareti di due cellule.','Fa aderire le cellule vicine. Se funghi o maturazione eccessiva la digeriscono, il tessuto si spappola.','p. 158'],
    [56,20,'Parete secondaria','Strati aggiunti verso l’interno dopo la crescita, ricchi di cellulosa; possono contenere lignina o suberina.','Rende la parete più rigida (legno) o impermeabile (sughero).','p. 157'],
-   [43,51,'Plasmodesma e punteggiatura','Ponte di citoplasma che passa in un foro della parete (punteggiatura).','Fa passare acqua e soluti da cellula a cellula: via simplastica.','p. 158'],
-   [73,61,'Desmotubulo','Sottile tubulo del reticolo endoplasmatico dentro il plasmodesma.','Collega il reticolo di una cellula con quello della cellula vicina.','p. 158']
+   [47,62,'Plasmodesma e punteggiatura','Ponte di citoplasma che passa in un foro della parete (punteggiatura).','Fa passare acqua e soluti da cellula a cellula: via simplastica.','p. 158',{target:[43,51]}],
+   [77,75,'Desmotubulo','Sottile tubulo del reticolo endoplasmatico dentro il plasmodesma.','Collega il reticolo di una cellula con quello della cellula vicina.','p. 158',{target:[73,61]}]
   ]},
  {id:'plastidi', label:'Cloroplasto e mitocondrio', img:'img/04_cloroplasto_mitocondrio.jpg', alt:'Cloroplasto e mitocondrio in sezione',
   intro:'A sinistra un cloroplasto, a destra un mitocondrio. Entrambi hanno doppia membrana, DNA circolare e ribosomi propri.',
   items:[
-   [4,45,'Doppia membrana del cloroplasto','Membrana esterna e membrana interna.','Separano il cloroplasto dal citoplasma.','p. 159'],
+   [7,22,'Doppia membrana del cloroplasto','Membrana esterna e membrana interna.','Separano il cloroplasto dal citoplasma.','p. 159',{target:[4,45]}],
    [29,22,'Granum (pl. grana)','Pila di tilacoidi, cisterne appiattite.','Sulla membrana dei tilacoidi ci sono clorofilla e fotosistemi: qui avviene la fase luminosa della fotosintesi.','p. 160'],
    [39,33,'Tilacoidi intergranali o stromatici','Tilacoidi che collegano un granum all’altro attraversando lo stroma.','Uniscono i grana in un unico sistema.','p. 160'],
-   [37,73,'Stroma','Liquido (matrice) all’interno del cloroplasto.','Qui avviene il ciclo di Calvin: la CO₂ entra nella gliceraldeide-3-fosfato e si formano gli zuccheri.','p. 160'],
+   [44,83,'Stroma','Liquido (matrice) all’interno del cloroplasto.','Qui avviene il ciclo di Calvin: la CO₂ entra nella gliceraldeide-3-fosfato e si formano gli zuccheri.','p. 160',{target:[37,73],area:[37,72,17,16]}],
    [15,62,'Granulo di amido primario','Deposito di amido dentro il cloroplasto.','Riserva temporanea: di notte diventa glucosio e saccarosio.','p. 160'],
    [32,66,'DNA circolare del cloroplasto','Molecola di DNA ad anello.','Contiene alcune istruzioni proprie del plastidio.','p. 159'],
    [55,62,'Membrana esterna del mitocondrio','Involucro esterno liscio.','Separa il mitocondrio dal citoplasma.',''],
    [72,30,'Creste mitocondriali','Pieghe della membrana interna.','Aumentano la superficie dove si produce energia.',''],
-   [73,50,'Matrice mitocondriale','Interno del mitocondrio.','Qui avvengono molte reazioni della respirazione.',''],
+   [68,73,'Matrice mitocondriale','Interno del mitocondrio.','Qui avvengono molte reazioni della respirazione.','',{target:[73,50],area:[72,50,17,16]}],
    [80,50,'DNA circolare del mitocondrio','Molecola di DNA ad anello.','Contiene alcune istruzioni proprie del mitocondrio.','']
   ]},
  {id:'turgore', label:'Turgore e plasmolisi', img:'img/05_turgore_plasmolisi.jpg', alt:'Cellula plasmolizzata, flaccida e turgida',
   intro:'La stessa cellula con quantità diverse di acqua nel vacuolo.',
   items:[
-   [16,50,'Cellula plasmolizzata','Il vacuolo ha perso molta acqua e il protoplasto si stacca dalla parete (plasmolisi).','Succede se la cellula sta in una soluzione molto concentrata, per esempio in acqua salata.','Attività pratica 1, pp. 264-265'],
-   [50,50,'Cellula flaccida','Il vacuolo ha poca acqua e non preme sulla parete.','Foglie e fusti erbacei si afflosciano: è l’appassimento, reversibile. L’avvizzimento invece è la morte delle cellule, irreversibile.','p. 159'],
-   [83,50,'Cellula turgida','Il vacuolo è pieno d’acqua e preme sulla parete, che resiste.','Questo equilibrio è il turgore cellulare: rende rigidi fusti erbacei e foglie.','p. 159']
+   [16,88,'Cellula plasmolizzata','Il vacuolo ha perso molta acqua e il protoplasto si stacca dalla parete (plasmolisi).','Succede se la cellula sta in una soluzione molto concentrata, per esempio in acqua salata.','Attività pratica 1, pp. 264-265',{target:[16,50],area:[16,50,24,55]}],
+   [50,88,'Cellula flaccida','Il vacuolo ha poca acqua e non preme sulla parete.','Foglie e fusti erbacei si afflosciano: è l’appassimento, reversibile. L’avvizzimento invece è la morte delle cellule, irreversibile.','p. 159',{target:[50,50],area:[50,50,24,55]}],
+   [83,88,'Cellula turgida','Il vacuolo è pieno d’acqua e preme sulla parete, che resiste.','Questo equilibrio è il turgore cellulare: rende rigidi fusti erbacei e foglie.','p. 159',{target:[83,50],area:[83,50,24,55]}]
   ]}
 ];
 
@@ -206,11 +211,25 @@ function render(){
   renderViews();
   const img = $('img'); img.src = view.img; img.alt = view.alt;
   const fig = $('figure');
-  fig.querySelectorAll('.pin').forEach(p => p.remove());
+  fig.querySelectorAll('.pin,.annotation-layer').forEach(p => p.remove());
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','annotation-layer'); svg.setAttribute('viewBox','0 0 100 100'); svg.setAttribute('preserveAspectRatio','none');
+  fig.appendChild(svg);
   view.items.forEach((it, i) => {
+    const meta = it[6] || {}, pin = meta.pin || [it[0],it[1]], target = meta.target;
+    if (target){
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',pin[0]); line.setAttribute('y1',pin[1]); line.setAttribute('x2',target[0]); line.setAttribute('y2',target[1]); svg.appendChild(line);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx',target[0]); dot.setAttribute('cy',target[1]); dot.setAttribute('r','1.15'); svg.appendChild(dot);
+    }
+    if (meta.area){
+      const area = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      area.setAttribute('cx',meta.area[0]); area.setAttribute('cy',meta.area[1]); area.setAttribute('rx',meta.area[2]/2); area.setAttribute('ry',meta.area[3]/2); svg.appendChild(area);
+    }
     const b = document.createElement('button');
-    b.className = 'pin'; b.style.left = it[0] + '%'; b.style.top = it[1] + '%';
-    b.textContent = i + 1;
+    b.className = 'pin'; b.style.left = pin[0] + '%'; b.style.top = pin[1] + '%';
+    b.innerHTML = `<span aria-hidden="true">${i+1}</span>`;
     b.setAttribute('aria-label', mode === 'quiz' ? 'Punto ' + (i + 1) : it[2]);
     if (i === current && mode === 'explore') b.setAttribute('aria-current', 'true');
     b.onclick = () => mode === 'explore' ? select(i) : answer(i, b);
