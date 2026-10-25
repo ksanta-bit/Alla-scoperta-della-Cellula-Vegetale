@@ -25,6 +25,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:17
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 48px}
 .wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+.institution{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;gap:10px;padding:7px 11px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 92%,var(--leaf-soft));color:var(--muted);line-height:1.3}
+.institution img{width:36px;height:36px;object-fit:contain}.institution b{color:var(--ink);font-size:13px}.institution small{display:block;margin-top:1px;font-size:11px}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,42px);line-height:1.1;color:var(--ink);margin:0;text-wrap:balance}
 .sub{margin:4px 0 0;color:var(--muted);max-width:62ch}
 .modes{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
@@ -71,6 +73,7 @@ footer{color:var(--muted);font-size:14px}
 </style>
 
 <div class="wrap">
+  <div class="institution" aria-label="Intestazione istituzionale"><img src="img/logo_scuola_8mkl.png" alt="Logo IIS 8 Marzo – K. Lorenz"><span><b>IIS “8 Marzo – K. Lorenz”, Mirano</b><small>Dirigente scolastica: dott.ssa Roberta Gasparini · Autore: prof. Gianluca Simonetti</small></span></div>
   <header>
     <div>
       <h1>Esplora la cellula vegetale</h1>
@@ -94,7 +97,7 @@ footer{color:var(--muted);font-size:14px}
     <ul class="list" id="list"></ul>
   </div>
 
-  <footer><b>App di Gianluca Simonetti</b> · IIS “8 Marzo – K. Lorenz”, Mirano · Agrobiologia, classi prime.<br>Membrana e pompa sodio-potassio: approfondimento di Biologia; nelle cellule vegetali la pompa principale è la pompa protonica (H⁺). Riferimento: Viridis, Modulo 3 – Botanica generale e sistematica, Unità 1 “La cellula e i tessuti vegetali”, pp. 155-161. Illustrazioni del percorso introduttivo.</footer>
+  <footer><b>Autore: prof. Gianluca Simonetti</b> · Agrobiologia, classi prime.<br>Membrana e pompa sodio-potassio: approfondimento di Biologia; nelle cellule vegetali la pompa principale è la pompa protonica (H⁺). Riferimento: Viridis, Modulo 3 – Botanica generale e sistematica, Unità 1 “La cellula e i tessuti vegetali”, pp. 155-161. Illustrazioni del percorso introduttivo.</footer>
 </div>
 
 <script>
@@ -116,7 +119,7 @@ const VIEWS = [
    [25,52,'Mitocondrio','Organello con doppia membrana; quella interna è ripiegata in creste.','Fa la respirazione cellulare: ricava energia dagli zuccheri usando l’ossigeno.',''],
    [24,62,'Perossisoma','Piccola vescicola.','Elimina sostanze dannose per la cellula, come l’acqua ossigenata.',''],
    [64,31,'Ribosomi','Granuli piccolissimi (i puntini viola), liberi nel citoplasma o attaccati al reticolo.','Costruiscono le proteine unendo gli amminoacidi.',''],
-   [83,90,'Citoplasma','Liquido (citosol) che riempie la cellula dentro la membrana, con gli organelli e il citoscheletro.','È l’ambiente in cui avvengono molte reazioni chimiche.','p. 157 (protoplasto = citoplasma + membrana)',{target:[70,76],area:[70,76,20,10]}],
+   [48,78,'Citoplasma','Parte della cellula compresa tra la membrana plasmatica e il nucleo: comprende il citosol, gli organelli e il citoscheletro.','Sostiene e contiene gli organelli ed è l’ambiente in cui avvengono molte reazioni chimiche.','p. 157 (protoplasto = contenuto vivente racchiuso dal plasmalemma)',{area:[55,77,35,11]}],
    [43,95,'Plasmodesma','Ponte di citoplasma che attraversa la parete passando per i fori detti punteggiature.','Mette in comunicazione cellule vicine: acqua e soluti passano per via simplastica.','p. 158',{target:[43,84]}]
   ]},
  {id:'membrana', label:'Membrana plasmatica', img:'img/06_membrana_plasmatica.jpg', alt:'Doppio strato di fosfolipidi con proteine',
